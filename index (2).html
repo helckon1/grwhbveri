@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LoveMatch - Проверь совместимость</title>
+    <script src="https://unpkg.com/vk-bridge/dist/browser.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #ff7eb3 0%, #ff758c 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+        
+        header {
+            background: #456;
+            color: white;
+            padding: 25px;
+            position: relative;
+        }
+        
+        h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            opacity: 0.8;
+            font-size: 14px;
+        }
+        
+        .heart {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .content {
+            padding: 30px 20px;
+        }
+        
+        .user-select {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        
+        .user-card {
+            width: 48%;
+            border: 2px dashed #ff7eb3;
+            border-radius: 15px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .user-card:hover {
+            transform: translateY(-5px);
+            border-color: #ff4d94;
+        }
+        
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            margin: 0 auto 10px;
+            overflow: hidden;
+            border: 3px solid #ff7eb3;
+        }
+        
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .user-name {
+            font-weight: 500;
+            margin-top: 5px;
+        }
+        
+        .select-btn {
+            background: #456;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 8px 15px;
+            margin-top: 10px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .calculate-btn {
+            background: linear-gradient(to right, #ff416c, #ff4b2b);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255, 65, 108, 0.4);
+            transition: all 0.3s;
+            margin-bottom: 30px;
+        }
+        
+        .calculate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 65, 108, 0.6);
+        }
+        
+        .result {
+            display: none;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+        
+        .score {
+            font-size: 72px;
+            font-weight: bold;
+            background: linear-gradient(to right, #ff416c, #ff4b2b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 10px 0;
+        }
+        
+        .description {
+            font-size: 18px;
+            margin: 15px 0;
+            line-height: 1.5;
+        }
+        
+        .details {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+        
+        .detail-item {
+            text-align: center;
+        }
+        
+        .detail-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff416c;
+        }
+        
+        .detail-label {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+        
+        .share-btn {
+            background: #456;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 30px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            margin: 0 auto;
+        }
+        
+        .share-btn svg {
+            margin-right: 8px;
+        }
+        
+        footer {
+            padding: 20px;
+            background: #f0f0f0;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="heart">❤️</div>
+            <h1>LoveMatch</h1>
+            <div class="subtitle">Узнай свою совместимость с другими</div>
+        </header>
+        
+        <div class="content">
+            <div class="user-select">
+                <div class="user-card" id="user1-card">
+                    <div class="avatar">
+                        <img id="user1-avatar" src="https://vk.com/images/camera_100.png" alt="Пользователь 1">
+                    </div>
+                    <div class="user-name" id="user1-name">Выбери себя</div>
+                    <button class="select-btn" onclick="selectUser(1)">Выбрать</button>
+                </div>
+                
+                <div class="user-card" id="user2-card">
+                    <div class="avatar">
+                        <img id="user2-avatar" src="https://vk.com/images/camera_100.png" alt="Пользователь 2">
+                    </div>
+                    <div class="user-name" id="user2-name">Выбери партнера</div>
+                    <button class="select-btn" onclick="selectUser(2)">Выбрать</button>
+                </div>
+            </div>
+            
+            <button class="calculate-btn" onclick="calculateCompatibility()">Проверить совместимость</button>
+            
+            <div class="result" id="result">
+                <h2>Ваша совместимость</h2>
+                <div class="score" id="score">0%</div>
+                <div class="description" id="description"></div>
+                
+                <div class="details">
+                    <div class="detail-item">
+                        <div class="detail-value" id="common-friends">0</div>
+                        <div class="detail-label">Общие друзья</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value" id="common-groups">0</div>
+                        <div class="detail-label">Общие группы</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value" id="common-interests">0</div>
+                        <div class="detail-label">Общие интересы</div>
+                    </div>
+                </div>
+                
+                <button class="share-btn" onclick="shareResult()">
+                    <svg width="20" height="20" viewBox="0 0 24 24">
+                        <path fill="white" d="M18 16c-.8 0-1.5.3-2 .9l-7-4.1c.1-.3.1-.6.1-.8s0-.5-.1-.8l7-4.1c.5.5 1.2.9 2 .9 1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3c0 .3.1.5.1.8l-7 4.1c-.5-.5-1.2-.9-2-.9-1.7 0-3 1.3-3 3s1.3 3 3 3c.8 0 1.5-.3 2-.9l7 4.1c-.1.3-.1.5-.1.8 0 1.7 1.3 3 3 3s3-1.3 3-3-1.3-3-3-3z"></path>
+                    </svg>
+                    Поделиться
+                </button>
+            </div>
+        </div>
+        
+        <footer>
+            Это приложение создано для развлечения. Результаты не являются научно обоснованными.
+        </footer>
+    </div>
+
+    <script>
+        // Данные пользователя
+        const users = [
+            {
+                id: 1,
+                name: "Анна Иванова",
+                avatar: "https://randomuser.me/api/portraits/women/12.jpg",
+                friends: 342,
+                groups: 45,
+                interests: ["путешествия", "музыка", "кино"]
+            },
+            {
+                id: 2,
+                name: "Максим Петров",
+                avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+                friends: 287,
+                groups: 32,
+                interests: ["спорт", "автомобили", "технологии"]
+            },
+            {
+                id: 3,
+                name: "Екатерина Смирнова",
+                avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+                friends: 421,
+                groups: 51,
+                interests: ["искусство", "чтение", "йога"]
+            },
+            {
+                id: 4,
+                name: "Артем Васильев",
+                avatar: "https://randomuser.me/api/portraits/men/22.jpg",
+                friends: 198,
+                groups: 28,
+                interests: ["игры", "программирование", "наука"]
+            }
+        ];
+
+        let selectedUser1 = null;
+        let selectedUser2 = null;
+
+        // Инициализация VK Bridge
+        vkBridge.send("VKWebAppInit");
+        
+        // Выбор пользователя
+        function selectUser(userNumber) {
+            const randomUser = users[Math.floor(Math.random() * users.length)];
+            
+            if (userNumber === 1) {
+                selectedUser1 = randomUser;
+                document.getElementById("user1-avatar").src = randomUser.avatar;
+                document.getElementById("user1-name").textContent = randomUser.name;
+            } else {
+                selectedUser2 = randomUser;
+                document.getElementById("user2-avatar").src = randomUser.avatar;
+                document.getElementById("user2-name").textContent = randomUser.name;
+            }
+        }
+        
+        // Расчет совместимости
+        function calculateCompatibility() {
+            if (!selectedUser1 || !selectedUser2) {
+                alert("Пожалуйста, выберите обоих пользователей!");
+                return;
+            }
+            
+            const commonInterests = selectedUser1.interests.filter(
+                interest => selectedUser2.interests.includes(interest)
+            ).length;
+            
+            const commonFriends = Math.min(selectedUser1.friends, selectedUser2.friends) * 0.1;
+            const commonGroups = Math.min(selectedUser1.groups, selectedUser2.groups) * 0.5;
+            
+            let score = 30 + 
+                       commonInterests * 15 + 
+                       Math.floor(commonFriends) + 
+                       Math.floor(commonGroups);
+            
+            score = Math.min(score, 100);
+            
+            let description = "";
+            if (score < 40) {
+                description = "Ваши пути редко пересекаются. Возможно, стоит найти больше общих интересов!";
+            } else if (score < 60) {
+                description = "У вас неплохая совместимость! Есть потенциал для развития отношений.";
+            } else if (score < 80) {
+                description = "Отличный результат! У вас много общего и хорошие перспективы.";
+            } else {
+                description = "Идеальная совместимость! Вы созданы друг для друга.";
+            }
+            
+            document.getElementById("score").textContent = score + "%";
+            document.getElementById("description").textContent = description;
+            document.getElementById("common-friends").textContent = Math.floor(commonFriends);
+            document.getElementById("common-groups").textContent = Math.floor(commonGroups);
+            document.getElementById("common-interests").textContent = commonInterests;
+            
+            document.getElementById("result").style.display = "block";
+            document.getElementById("result").scrollIntoView({ behavior: "smooth" });
+        }
+        
+        // Поделиться результатом
+        function shareResult() {
+            const score = document.getElementById("score").textContent;
+            
+            vkBridge.send("VKWebAppShare", {
+                link: "https://vk.com/app12345678"
+            }).then(data => {
+                console.log("Результат опубликован!");
+            }).catch(error => {
+                console.error("Ошибка публикации:", error);
+                alert("Скопируйте ссылку: https://vk.com/app12345678");
+            });
+        }
+        
+        // Автоматическая инициализация
+        window.onload = () => {
+            setTimeout(() => {
+                selectedUser1 = users[0];
+                document.getElementById("user1-avatar").src = users[0].avatar;
+                document.getElementById("user1-name").textContent = users[0].name;
+                
+                selectedUser2 = users[1];
+                document.getElementById("user2-avatar").src = users[1].avatar;
+                document.getElementById("user2-name").textContent = users[1].name;
+            }, 1000);
+        };
+    </script>
+</body>
+</html>
